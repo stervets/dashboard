@@ -1,0 +1,27 @@
+{
+  "name": "dashboard",
+  "description": "Dashboard application",
+  "main": "server/app.js",
+  "authors": [
+    "Mikhail Lisov"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.3",
+    "angular": "^1.5.4",
+    "angular-route": "^1.5.3",
+    "angular-animate": "^1.5.3",
+    "triangle": "^0.0.6",
+    "underscore": "^1.8.3"
+  }
+}

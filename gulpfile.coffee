@@ -1,138 +1,163 @@
-# utils
-#path = require "path"
-#args = (require "yargs").argv
-
-
-# gulp
 gulp = require "gulp"
 plumber = require "gulp-plumber"
 jade = require "gulp-jade"
 stylus = require "gulp-stylus"
 coffeeify = require "gulp-coffeeify"
 cson = require "gulp-cson"
-config = require "gulp-site-config"
-globalShim = require "browserify-global-shim"
+siteConfig = require "gulp-site-config"
+uglify = require "gulp-uglify"
+vendor = require "gulp-concat-vendor"
 nib = require "nib"
 
 argv = (require "yargs").argv
 connect = require 'gulp-connect'
-siteConfig = {}
+publicGlobals = {}
+vendorBundle = {}
 
+###
+  Gulp config
+###
 params =
-    path:
-        public: "public"
-        jadeCompile: "src/public/**/[^_]*.jade"
-        jadeWatch: "src/public/**/*.jade"
-        stylusCompile: "src/public/**/[^_]*.styl"
-        stylusWatch: "src/public/**/*.styl"
-        coffeeCompile:
-            config: "src/public/config.coffee"
-            app: "src/public/app.coffee"
-        coffeeWatch: [
-            "src/public/**/*.coffee"
-            "^src/public/app.coffee"
-        ]
+  path:
+    public: "public"
+    jadeCompile: "src/public/**/[^_]*.jade"
+    jadeWatch: "src/public/**/*.jade"
+    stylusCompile: "src/public/**/[^_]*.styl"
+    stylusWatch: "src/public/**/*.styl"
+    coffeeCompile: "src/public/app.coffee"
+    coffeeWatch: "src/public/**/*.coffee"
 
-    server: argv.server || 8080
-    liveReload: argv.liveReload || 8081
-    debug: argv.debug
+    publicGlobals: "src/config/public-globals.coffee"
+    vendorBundle: "src/config/vendor-bundle.coffee"
+
+  server: argv.server || 8080
+  liveReload: argv.liveReload || 8081
+  debug: argv.debug
 
 
 logErrorMessage = (error)-> console.log error.message
 
-gulp.task "getSiteConfig", ->
-    gulp
-    .src params.path.coffeeCompile.config
-    .pipe plumber()
-    .pipe cson()
-    .pipe config siteConfig
-    .on 'end', ->
-        console.log siteConfig.config
-        globalShim.configure siteConfig.config
+###
+  Globals exports to jade and client scripts
+###
+gulp.task "getPublicGlobals", ->
+  publicGlobals = {}
+  gulp
+  .src params.path.publicGlobals
+  .pipe plumber()
+  .pipe cson()
+  .pipe siteConfig publicGlobals
+  .on 'end', ->
+    publicGlobals = publicGlobals[Object.keys(publicGlobals)[0]]
 
 ###
-    Build jade task
+  Vendor libs
+###
+gulp.task "getVendorBundle", ->
+  vendorBundle = {}
+  gulp
+  .src params.path.vendorBundle
+  .pipe plumber()
+  .pipe cson()
+  .pipe siteConfig vendorBundle
+  .on 'end', ->
+    vendorBundle = vendorBundle[Object.keys(vendorBundle)[0]].map (name)->
+      "vendor/#{name}"
+
+###
+  Concat vendors libs into vendor.js
+###
+gulp.task "buildVendorBundle", ["getVendorBundle"], ->
+  unless vendorBundle?.length
+    console.warn "Wrong vendor bundle config"
+    return
+  vendorPipe = gulp.src vendorBundle
+  .pipe plumber()
+  .pipe vendor "vendor.js"
+  vendorPipe = vendorPipe.pipe uglify() unless params.debug
+  vendorPipe.pipe gulp.dest params.path.public
+  .pipe connect.reload()
+
+###
+    Build jade
 ###
 gulp.task "buildJade", ->
-    gulp
-    .src params.path.jadeCompile
-    .pipe plumber()
-    .pipe (
-        jade
-            pretty: params.debug
-            locals: siteConfig.config
-    )
-    .pipe gulp.dest params.path.public
-    .pipe connect.reload()
+  gulp
+  .src params.path.jadeCompile
+  .pipe plumber()
+  .pipe (
+    jade
+      pretty: params.debug
+      locals: publicGlobals
+  )
+  .pipe gulp.dest params.path.public
+  .pipe connect.reload()
 
 ###
-    Build styles task
+    Build styles
 ###
 gulp.task "buildStylus", ->
-    gulp.src params.path.stylusCompile
-    .pipe plumber()
-    .pipe(
-        stylus
-            use: nib()
-            compress: !params.debug
-            'include css': true
-    )
-    .pipe gulp.dest params.path.public
-    .pipe connect.reload()
+  gulp.src params.path.stylusCompile
+  .pipe plumber()
+  .pipe(
+    stylus
+      use: nib()
+      compress: !params.debug
+      'include css': true
+  )
+  .pipe gulp.dest params.path.public
+  .pipe connect.reload()
 
 ###
-    Build coffee task
+    Build coffee
 ###
 gulp.task "buildCoffee", ->
-    #coffeeify.transform globalShim
-    globalShim.configure
-        'aaaaa':
-            'exports':
-                a: 111111
-                b: 222222
-    gulp.src params.path.coffeeCompile.app
-    .pipe plumber()
-    .pipe(
-        coffeeify
-            options:
-                debug: params.debug
-                insertGlobals:
-                    a: 222
-                    b: 333
-                insertGlobalVars:
-                    aaaa: ->
-                    bbbb: ->
-                        a: 111
-                        b: 222
-    )
-    .pipe gulp.dest params.path.public
-    .pipe connect.reload()
+  globalVars = {}
+  for key, val of publicGlobals
+    globalVars[key] = ((val)-> -> val)(JSON.stringify(val))
+
+  coffeePipe = gulp
+  .src params.path.coffeeCompile
+  .pipe plumber()
+  .pipe(
+    coffeeify
+      options:
+        debug: params.debug
+        insertGlobals: params.debug
+        insertGlobalVars: globalVars
+  )
+  coffeePipe = coffeePipe.pipe uglify() unless params.debug
+  coffeePipe.pipe gulp.dest params.path.public
+  .pipe connect.reload()
 
 ###
-    Build task
+  Rebuild coffee and jade with public glabal vars
 ###
+gulp.task "getPublicGlobalsAndRebuild", ["getPublicGlobals"], ->
+  gulp.start "buildCoffee"
+  gulp.start "buildJade"
 
-gulp.task "getSiteConfigAndCompile", ["getSiteConfig"], ->
-    gulp.start "buildCoffee"
-    gulp.start "buildJade"
 
-
-gulp.task "build", ["getSiteConfigAndCompile"], ->
-    gulp.start ["buildStylus"]
+###
+  Build task
+###
+gulp.task "build", ["buildVendorBundle", "getPublicGlobalsAndRebuild"], ->
+  gulp.start ["buildStylus"]
 
 ###
     Development task
 ###
 gulp.task "devel", ["build"], ->
-        gulp.watch params.path.jadeWatch, ["buildJade"]
-        gulp.watch params.path.stylusWatch, ["buildStylus"]
-        gulp.watch params.path.coffeeCompile.config, ["getSiteConfigAndCompile"]
-        gulp.watch params.path.coffeeWatch, ["buildCoffee"]
+  gulp.watch params.path.jadeWatch, ["buildJade"]
+  gulp.watch params.path.stylusWatch, ["buildStylus"]
+  gulp.watch params.path.coffeeWatch, ["buildCoffee"]
+  gulp.watch params.path.publicGlobals, ["getPublicGlobalsAndRebuild"]
+  gulp.watch params.path.vendorBundle, ["buildVendorBundle"]
 
-        connect.server
-            root: params.path.public
-            port: params.server
-            livereload:
-                port: params.liveReload
+  connect.server
+    root: params.path.public
+    port: params.server
+    livereload:
+      port: params.liveReload
 
 gulp.task "default", ["build"]
