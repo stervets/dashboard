@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/stervets/dashboard#readme",
   "devDependencies": {
+    "browserify-replace": "^0.9.0",
     "gulp": "^3.9.1",
     "gulp-coffeeify": "^0.1.8",
     "gulp-concat-vendor": "0.0.4",

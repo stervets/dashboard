@@ -7,10 +7,12 @@ cson = require "gulp-cson"
 siteConfig = require "gulp-site-config"
 uglify = require "gulp-uglify"
 vendor = require "gulp-concat-vendor"
+browserifyReplace = require "browserify-replace"
 nib = require "nib"
 
 argv = (require "yargs").argv
 connect = require 'gulp-connect'
+
 publicGlobals = {}
 vendorBundle = {}
 
@@ -29,6 +31,10 @@ params =
 
     publicGlobals: "src/config/public-globals.coffee"
     vendorBundle: "src/config/vendor-bundle.coffee"
+
+  angularBundle: ['factory', 'controller', 'directive']
+  replacePattern: ///"ANGULAR_BUNDLE_CODE"///g
+
 
   server: argv.server || 8080
   liveReload: argv.liveReload || 8081
@@ -116,6 +122,13 @@ gulp.task "buildCoffee", ->
   for key, val of publicGlobals
     globalVars[key] = ((val)-> -> val)(JSON.stringify(val))
 
+  angularBundleCode = ""
+  params.angularBundle.forEach (bundleItem)->
+    upcasedBundleItem = bundleItem.toUpperCase()
+    return unless typeof publicGlobals[upcasedBundleItem] is 'object'
+    for key, val of publicGlobals[upcasedBundleItem]
+      angularBundleCode += "app.#{bundleItem} #{upcasedBundleItem}.#{key}, require(\"./app/#{bundleItem}/#{val}\")\n"
+
   coffeePipe = gulp
   .src params.path.coffeeCompile
   .pipe plumber()
@@ -125,13 +138,21 @@ gulp.task "buildCoffee", ->
         debug: params.debug
         insertGlobals: params.debug
         insertGlobalVars: globalVars
+        transform: [
+          [browserifyReplace,
+            replace: [
+              from: params.replacePattern
+              to: angularBundleCode
+            ]
+          ]
+        ]
   )
   coffeePipe = coffeePipe.pipe uglify() unless params.debug
   coffeePipe.pipe gulp.dest params.path.public
   .pipe connect.reload()
 
 ###
-  Rebuild coffee and jade with public glabal vars
+  Rebuild coffee and jade with public global vars
 ###
 gulp.task "getPublicGlobalsAndRebuild", ["getPublicGlobals"], ->
   gulp.start "buildCoffee"

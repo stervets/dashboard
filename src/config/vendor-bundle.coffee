@@ -1,6 +1,6 @@
 [
   'jquery'
-  'bootstrap'
+
   'underscore'
   'angularjs'
   'angular-route'

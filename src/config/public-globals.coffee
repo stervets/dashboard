@@ -1,4 +1,10 @@
 APPLICATION: 'DashboardApplication'
 
+FACTORY: {}
+
 CONTROLLER:
-  MAIN: 'MainController'
+  DEFAULT_PAGE: 'DefaultPageController'
+
+DIRECTIVE: {}
+
+
