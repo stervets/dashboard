@@ -40,6 +40,13 @@ params =
   liveReload: argv.liveReload || 8081
   debug: argv.debug
 
+###
+  Transform "CamelCaseString" to "camel-case-string"
+###
+camelCaseToDash = (s)->
+  s[0].toLowerCase()+s.slice(1).replace(
+    ///([A-Z])///g, ($0)->"-#{$0.toLowerCase()}"
+  )
 
 logErrorMessage = (error)-> console.log error.message
 
@@ -127,7 +134,9 @@ gulp.task "buildCoffee", ->
     upcasedBundleItem = bundleItem.toUpperCase()
     return unless typeof publicGlobals[upcasedBundleItem] is 'object'
     for key, val of publicGlobals[upcasedBundleItem]
-      angularBundleCode += "app.#{bundleItem} #{upcasedBundleItem}.#{key}, require(\"./app/#{bundleItem}/#{val}\")\n"
+      filename = camelCaseToDash(val).split('-')
+      filename.pop()
+      angularBundleCode += "app.#{bundleItem} #{upcasedBundleItem}.#{key}, require(\"./app/#{bundleItem}/#{filename.join('-')}\")\n"
 
   coffeePipe = gulp
   .src params.path.coffeeCompile

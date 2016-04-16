@@ -7,9 +7,5 @@ app = new Triangle APPLICATION, [
 
 app.angular.config appRoutes.disableHtml5Mode
 
-app.controller CONTROLLER.MAIN,
-  init: ->
-    console.log CONTROLLER.MAIN
-
-
+# Driven by gulp. Do not remove the line below.
 "ANGULAR_BUNDLE_CODE"
