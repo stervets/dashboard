@@ -6,17 +6,14 @@ module = new Triangle MODULE_NAME
 
 router = require('./app/router')
 
-app = new Triangle(
-  APPLICATION.NAME,
-  APPLICATION.MODULES.concat([MODULE_NAME]),
-  router.routes
-)
+app = new Triangle APPLICATION.NAME, APPLICATION.MODULES.concat([MODULE_NAME]), router.routes
+
 
 app.angular.config router.disableHtml5Mode
 app.angular.config ['$mdThemingProvider', ($mdThemingProvider)->
-    theme = $mdThemingProvider.theme('default')
-    theme = theme.dark() if THEME.DARK
-    theme
-    .primaryPalette THEME.PRIMARY_PALETTE
-    .accentPalette THEME.ACCENT_PALETTE
+  theme = $mdThemingProvider.theme('default')
+  theme = theme.dark() if THEME.DARK
+  theme
+  .primaryPalette THEME.PRIMARY_PALETTE
+  .accentPalette THEME.ACCENT_PALETTE
 ]

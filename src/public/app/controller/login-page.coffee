@@ -1,14 +1,19 @@
 module.exports =
-    inject: [FACTORY.USER, '$timeout']
-    local:
-        scope:
-            userStatus: FACTORY.USER
-            authPopup: FACTORY.USER
-            canShowLoginForm: false
+  inject: [FACTORY.USER, '$timeout', '$location']
+  local:
+    scope:
+      user: FACTORY.USER
+      authPopup: FACTORY.USER
+      canShowLoginForm: false
 
+    showLoginForm: ->
+      @$scope.canShowLoginForm = true
 
-        showLoginForm: ->
-                @$scope.canShowLoginForm = true
+    onUserAuthenticatedChange: ->
+      @$location.url '/dashboard' if @user.authenticated
 
-    init: ->
-        @$timeout @showLoginForm, 300
+    watch:
+      'user.authenticated': 'onUserAuthenticatedChange'
+  init: ->
+    @[FACTORY.USER].logout()
+    @$timeout @showLoginForm, 300

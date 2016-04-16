@@ -1,9 +1,9 @@
-checkAuth = ['$location', FACTORY.USER, '$rootScope', ($location, UserFactory, $rootScope)->
-  $rootScope.userStatus = UserFactory.userStatus
-  $rootScope.$watch 'userStatus.gotAuthStatus', (gotAuth)->
-    if gotAuth and !UserFactory.userStatus.auth
-      $location.url '/login'
-]
+checkAuth =
+  checkUserAuth: ['$location', FACTORY.USER, '$rootScope', ($location, $user, $rootScope)->
+    $rootScope.user = $user.user
+    $rootScope.$watch 'user.authenticated', (authenticated)->
+      $location.url '/login' unless authenticated
+  ]
 
 routes =
   '/login':

@@ -1,21 +1,41 @@
 module.exports =
-    inject: '$firebaseObject'
-    userStatus:
-        auth: false
-        gotAuthStatus: false
+  inject: [FACTORY.FIREBASE, '$rootScope']
 
-    firebase: null
-    auth: null
+  user: {}
 
-    onAuth: (error, authData)->
-        console.log error, authData
+  userDefaults:
+    authenticated: false
+    id: null
+    name: ''
+    avatar: ''
 
-    authPopup: (provider)->
-        return unless provider in AUTH_PROVIDERS
-        @firebase.authWithOAuthPopup provider, @onAuth
+  firebase: null
 
-    init: ->
-        @firebase = new Firebase FIREBASE_ADDR
-        @auth = @firebase.getAuth()
-        @userStatus.auth = !!@auth
-        @userStatus.gotAuthStatus = true
+  onAuthWithOAuthPopup: (error, authData)->
+    return if error?
+    @authUser authData
+    @$rootScope.$apply()
+
+  authPopup: (provider)->
+    @firebase.authWithOAuthPopup provider, @onAuthWithOAuthPopup
+
+  logout: ->
+    @firebase.unauth()
+    @resetUser()
+
+  resetUser: ->
+    angular.extend @user, @userDefaults
+
+  authUser: (authData)->
+    return unless authData?.provider
+    angular.extend @user,
+      id: authData.uid
+      authenticated: true
+      name: authData[authData.provider].displayName
+      avatar: authData[authData.provider].profileImageURL
+
+  init: ->
+    @resetUser()
+    @firebase = @[FACTORY.FIREBASE].firebase
+    @authUser authData if (authData = @firebase.getAuth())
+

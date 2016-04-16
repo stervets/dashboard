@@ -22,23 +22,20 @@ PUBLIC_PAGES: [
   '/about'
 ]
 
-# firebase auth providers connected
-AUTH_PROVIDERS: [
-  'google'
-  'facebook'
-  'github'
-]
-
 # material design theme
 THEME:
   DARK: true
   PRIMARY_PALETTE: 'indigo'
   ACCENT_PALETTE: 'amber'
 
+LOCAL_PROPERTY: "LocalProperty"
+LOCAL_METHOD: "LocalMethod"
+
 ###
   Angular bundle generator section
 ###
 FACTORY:
+  FIREBASE: 'FirebaseFactory'
   USER: 'UserFactory'
 
 CONTROLLER:

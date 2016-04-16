@@ -1,1 +1,12 @@
-|ok
+md-content.md-hue-1.main-content(layout="column")
+  md-toolbar(layout="row", layout-align="top")
+    .md-toolbar-tools
+      h1 Dashboard demo application
+      span(flex, layout="center")
+
+      img.avatar(ng-src="{{user.avatar}}", alt="{{user.name}}")
+      span.md-body-2.username {{user.name}}
+      a.md-button.md-icon-button(href="/#/login")
+        i.fa.fa-lg.fa-sign-out
+
+  md-content.md-hue-1.background-image(flex, layout="row", layout-align="center center", style='height: 100%')
