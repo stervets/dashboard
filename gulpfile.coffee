@@ -74,7 +74,6 @@ gulp.task "getVendorBundle", ->
     vendorBundle = vendorBundle[Object.keys(vendorBundle)[0]].map (name)->
       "vendor/#{name}"
 
-
 ###
   Concat vendors libs into vendor.js
 ###
@@ -137,7 +136,7 @@ gulp.task "buildCoffee", ->
     for key, val of publicGlobals[upcasedBundleItem]
       filename = camelCaseToDash(val).split('-')
       filename.pop()
-      angularBundleCode += "app.#{bundleItem} #{upcasedBundleItem}.#{key}, require(\"./app/#{bundleItem}/#{filename.join('-')}\")\n"
+      angularBundleCode += "module.#{bundleItem} #{upcasedBundleItem}.#{key}, require(\"./app/#{bundleItem}/#{filename.join('-')}\")\n"
 
   Object.keys(require.cache).forEach (cacheItem)->
     if cacheItem.indexOf("gulp-coffeeify") >= 0

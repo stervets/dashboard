@@ -1,0 +1,24 @@
+md-content.md-hue-1.main-content(layout="column")
+    md-toolbar(layout="row", layout-align="top")
+        .md-toolbar-tools
+            h1 Dahboard demo application
+
+    md-content.md-hue-1.background-image(flex, layout="row", layout-align="center center", style='height: 100%')
+        md-whiteframe.md-whiteframe-5dp.animation-opacity(ng-show='canShowLoginForm && !userStatus.auth')
+            md-toolbar
+                .md-toolbar-tools
+                    h2 Please login using one of following services
+            md-content.login-form(layout="row", layout-align="center center")
+                    md-button.md-raised(ng-click="authPopup('google')")
+                        i.fa.fa-lg.fa-google
+                        | Google
+
+                    md-button.md-raised(ng-click="authPopup('facebook')")
+                        i.fa.fa-lg.fa-facebook
+                        | Facebook
+
+                    md-button.md-raised(ng-click="authPopup('github')")
+                        i.fa.fa-lg.fa-github
+                        | Github
+
+
