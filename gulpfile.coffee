@@ -23,7 +23,7 @@ params =
     public: "public"
     jadeCompile: "src/public/**/[^_]*.jade"
     jadeWatch: "src/public/**/*.jade"
-    stylusCompile: "src/public/**/[^_]*.styl"
+    stylusCompile: "src/public/app.styl"
     stylusWatch: "src/public/**/*.styl"
     coffeeCompile: "src/public/app.coffee"
     coffeeWatch: "src/public/**/*.coffee"
@@ -43,11 +43,9 @@ params =
   Transform "CamelCaseString" to "camel-case-string"
 ###
 camelCaseToDash = (s)->
-  s[0].toLowerCase()+s.slice(1).replace(
-    ///([A-Z])///g, ($0)->"-#{$0.toLowerCase()}"
+  s[0].toLowerCase() + s.slice(1).replace(
+    ///([A-Z])///g, ($0)-> "-#{$0.toLowerCase()}"
   )
-
-logErrorMessage = (error)-> console.log error.message
 
 ###
   Globals exports to jade and client scripts
@@ -142,7 +140,7 @@ gulp.task "buildCoffee", ->
       angularBundleCode += "app.#{bundleItem} #{upcasedBundleItem}.#{key}, require(\"./app/#{bundleItem}/#{filename.join('-')}\")\n"
 
   Object.keys(require.cache).forEach (cacheItem)->
-    if cacheItem.indexOf("gulp-coffeeify")>=0
+    if cacheItem.indexOf("gulp-coffeeify") >= 0
       delete require.cache[cacheItem]
 
   coffeePipe = gulp
