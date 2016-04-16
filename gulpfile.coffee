@@ -6,6 +6,7 @@ cson = require "gulp-cson"
 siteConfig = require "gulp-site-config"
 uglify = require "gulp-uglify"
 vendor = require "gulp-concat-vendor"
+browserifyReplace = require "browserify-replace"
 nib = require "nib"
 
 argv = (require "yargs").argv
@@ -141,7 +142,7 @@ gulp.task "buildCoffee", ->
       angularBundleCode += "app.#{bundleItem} #{upcasedBundleItem}.#{key}, require(\"./app/#{bundleItem}/#{filename.join('-')}\")\n"
 
   Object.keys(require.cache).forEach (cacheItem)->
-    if cacheItem.indexOf("browserify-replace")>=0 or cacheItem.indexOf("gulp-coffeeify")>=0
+    if cacheItem.indexOf("gulp-coffeeify")>=0
       delete require.cache[cacheItem]
 
   coffeePipe = gulp
@@ -149,17 +150,13 @@ gulp.task "buildCoffee", ->
   .pipe plumber()
   .pipe(
     require("gulp-coffeeify")
-      cache: false
       options:
-        cache: false
         debug: params.debug
         insertGlobals: params.debug
         insertGlobalVars: globalVars
         transform: [
-          [require("browserify-replace"),
-            cache: false
+          [browserifyReplace,
             replace: [
-              cache: false
               from: params.replacePattern
               to: angularBundleCode
             ]
