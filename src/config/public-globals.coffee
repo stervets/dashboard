@@ -1,4 +1,4 @@
-APPLICATION: 'DashboardApplication'
+APPLICATION_NAME: 'DashboardApplication'
 
 
 ###
@@ -9,6 +9,7 @@ FACTORY: {}
 CONTROLLER:
   # /app/controller/default-page.coffee file will be required
   DEFAULT_PAGE: 'DefaultPageController'
+  LOGIN_PAGE: 'LoginPageController'
 
 DIRECTIVE: {}
 

@@ -1,6 +1,6 @@
 appRoutes = require('./app/routes')
 
-app = new Triangle APPLICATION, [
+app = new Triangle APPLICATION_NAME, [
   'ngRoute'
   'ngAnimate'
 ], appRoutes.routes

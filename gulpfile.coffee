@@ -2,12 +2,10 @@ gulp = require "gulp"
 plumber = require "gulp-plumber"
 jade = require "gulp-jade"
 stylus = require "gulp-stylus"
-coffeeify = require "gulp-coffeeify"
 cson = require "gulp-cson"
 siteConfig = require "gulp-site-config"
 uglify = require "gulp-uglify"
 vendor = require "gulp-concat-vendor"
-browserifyReplace = require "browserify-replace"
 nib = require "nib"
 
 argv = (require "yargs").argv
@@ -77,19 +75,21 @@ gulp.task "getVendorBundle", ->
     vendorBundle = vendorBundle[Object.keys(vendorBundle)[0]].map (name)->
       "vendor/#{name}"
 
+
 ###
   Concat vendors libs into vendor.js
 ###
 gulp.task "buildVendorBundle", ["getVendorBundle"], ->
   unless vendorBundle?.length
     console.warn "Wrong vendor bundle config"
-    return
+    return true
   vendorPipe = gulp.src vendorBundle
   .pipe plumber()
   .pipe vendor "vendor.js"
   vendorPipe = vendorPipe.pipe uglify() unless params.debug
   vendorPipe.pipe gulp.dest params.path.public
   .pipe connect.reload()
+  true
 
 ###
     Build jade
@@ -105,6 +105,7 @@ gulp.task "buildJade", ->
   )
   .pipe gulp.dest params.path.public
   .pipe connect.reload()
+  true
 
 ###
     Build styles
@@ -120,6 +121,7 @@ gulp.task "buildStylus", ->
   )
   .pipe gulp.dest params.path.public
   .pipe connect.reload()
+  true
 
 ###
     Build coffee
@@ -138,18 +140,26 @@ gulp.task "buildCoffee", ->
       filename.pop()
       angularBundleCode += "app.#{bundleItem} #{upcasedBundleItem}.#{key}, require(\"./app/#{bundleItem}/#{filename.join('-')}\")\n"
 
+  Object.keys(require.cache).forEach (cacheItem)->
+    if cacheItem.indexOf("browserify-replace")>=0 or cacheItem.indexOf("gulp-coffeeify")>=0
+      delete require.cache[cacheItem]
+
   coffeePipe = gulp
   .src params.path.coffeeCompile
   .pipe plumber()
   .pipe(
-    coffeeify
+    require("gulp-coffeeify")
+      cache: false
       options:
+        cache: false
         debug: params.debug
         insertGlobals: params.debug
         insertGlobalVars: globalVars
         transform: [
-          [browserifyReplace,
+          [require("browserify-replace"),
+            cache: false
             replace: [
+              cache: false
               from: params.replacePattern
               to: angularBundleCode
             ]
@@ -159,6 +169,7 @@ gulp.task "buildCoffee", ->
   coffeePipe = coffeePipe.pipe uglify() unless params.debug
   coffeePipe.pipe gulp.dest params.path.public
   .pipe connect.reload()
+  true
 
 ###
   Rebuild coffee and jade with public global vars
@@ -166,6 +177,7 @@ gulp.task "buildCoffee", ->
 gulp.task "getPublicGlobalsAndRebuild", ["getPublicGlobals"], ->
   gulp.start "buildCoffee"
   gulp.start "buildJade"
+  true
 
 
 ###
@@ -180,7 +192,7 @@ gulp.task "build", ["buildVendorBundle", "getPublicGlobalsAndRebuild"], ->
 gulp.task "devel", ["build"], ->
   gulp.watch params.path.jadeWatch, ["buildJade"]
   gulp.watch params.path.stylusWatch, ["buildStylus"]
-  gulp.watch params.path.coffeeWatch, ["buildCoffee"]
+  gulp.watch params.path.coffeeWatch, ["getPublicGlobalsAndRebuild"]
   gulp.watch params.path.publicGlobals, ["getPublicGlobalsAndRebuild"]
   gulp.watch params.path.vendorBundle, ["buildVendorBundle"]
 

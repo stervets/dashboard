@@ -1,6 +1,5 @@
 [
   'jquery'
-
   'underscore'
   'angularjs'
   'angular-route'
