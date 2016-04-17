@@ -1,12 +1,38 @@
-md-content.md-hue-1.main-content(layout="column")
-  md-toolbar(layout="row", layout-align="top")
-    .md-toolbar-tools
-      h1 Dashboard demo application
-      span(flex, layout="center")
+include dashboard-templates.jade
 
+md-content.md-hue-1.main-content(layout="column")
+  md-toolbar(layout="row", layout-align="top").md-hue-2
+    .md-toolbar-tools.md-hue-2
+      h1 Dashboard demo application
+      md-menu-bar.dashboard-menu(flex)
+          md-menu
+            button.md-button.md-raised.md-primary(ng-click='$mdOpenMenu()')
+              i.fa.fa-plus
+              | add Widget
+            md-menu-content.md-hue-2
+              md-menu-item
+                md-button(ng-click="addWidget('chart')") Chart widget
+
+          md-button.md-button.md-icon-button(aria-label="Expand all widgets")
+            md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+              | Expand all widgets
+            i.material-icons.md-24 view_stream
+          md-button.md-button.md-icon-button(aria-label="Collapse all widgets")
+            md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+              | Collapse all widgets
+            i.material-icons.md-24 view_module
+          md-button.md-button.md-icon-button(aria-label="Collapse all widgets")
+            md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+              | Align widgets
+            i.material-icons.md-24 dashboard
       img.avatar(ng-src="{{user.avatar}}", alt="{{user.name}}")
       span.md-body-2.username {{user.name}}
       a.md-button.md-icon-button(href="/#/login")
         i.fa.fa-lg.fa-sign-out
 
-  md-content.md-hue-1.background-image(flex, layout="row", layout-align="center center", style='height: 100%')
+
+  md-content.md-hue-1.background-image(flex, layout="column", layout-align="top center", style='height: 100%')
+    .dashboard-table(dashboard-table)
+      .jsDashboardTableBody.dashboard-table-body
+        dashboard-widget(widget='widget' ng-repeat='widget in db.widgets')
+          |{{widget}}

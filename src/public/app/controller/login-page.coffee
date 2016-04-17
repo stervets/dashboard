@@ -14,6 +14,7 @@ module.exports =
 
     watch:
       'user.authenticated': 'onUserAuthenticatedChange'
+      
   init: ->
     @[FACTORY.USER].logout()
     @$timeout @showLoginForm, 300

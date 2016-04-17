@@ -1,22 +1,19 @@
 module.exports =
-  inject: [FACTORY.USER, FACTORY.FIREBASE]
+  inject: [FACTORY.USER, FACTORY.FIREBASE, FACTORY.DASHBOARD]
   local:
     scope:
-      firebase: FACTORY.FIREBASE
-      db: FACTORY.FIREBASE
       user: FACTORY.USER
-      dashboard: LOCAL_PROPERTY
+      dashboard: FACTORY.DASHBOARD
+      db: FACTORY.FIREBASE
+      addWidget: LOCAL_METHOD
 
-    dashboard:
-      loaded: false
-
-    onDbWidgetsChange: ->
-      @dashboard.loaded = @db.widgets?
-      console.log @dashboard.loaded
-      console.log @db.widgets
-
-    watch:
-      'db.widgets': 'onDbWidgetsChange'
+    addWidget: (type)->
+      @[FACTORY.DASHBOARD].addWidget
+        type: type
+        x: 0
+        y: 0
+        w: Math.floor @dashboard.tableWidth/2
+        h: 2
 
   init: ->
     return unless @user.authenticated

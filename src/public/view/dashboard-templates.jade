@@ -1,0 +1,36 @@
+script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
+    .jsDashboardWidget.dashboard-widget(ng-class="{'animation-xy-hw': flag.animated}")
+        .dashboard-widget-menu
+            md-fab-speed-dial.md-scale.md-fab-top-right(
+            ng-hide='demo.hidden',
+            md-direction='left',
+            md-open='true',
+            ng-mouseenter='demo.isOpen=true',
+            ng-mouseleave='demo.isOpen=false'
+            )
+                //md-fab-trigger
+                    md-button.md-fab.md-warn(aria-label='menu')
+                        md-tooltip(md-direction='top', md-visible='tooltipVisible') Menu
+                        i.fa.fa-sm.fa-bars
+                md-fab-actions
+                    md-button.md-fab.md-raised.md-mini(aria-label='{{item.name}}', ng-click='demo.openDialog($event, item)')
+                        md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+                            | Close widget
+                        i.material-icons.md-24 close
+
+                    md-button.md-fab.md-raised.md-mini(aria-label='{{item.name}}', ng-click='demo.openDialog($event, item)')
+                        md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+                            | Widget options
+                        i.material-icons.md-24 settings
+
+                    md-button.md-fab.md-raised.md-mini(aria-label='{{item.name}}', ng-click='demo.openDialog($event, item)')
+                        md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+                            | Moving mode
+                        i.material-icons.md-24 open_with
+
+                    md-button.md-fab.md-raised.md-mini(aria-label='{{item.name}}', ng-click='demo.openDialog($event, item)')
+                        md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+                            | View full screen
+                        i.material-icons.md-24 aspect_ratio
+        .dashboard-widget-resizer
+            i.material-icons.md-24 network_cell

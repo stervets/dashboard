@@ -6,6 +6,7 @@ cson = require "gulp-cson"
 siteConfig = require "gulp-site-config"
 uglify = require "gulp-uglify"
 vendor = require "gulp-concat-vendor"
+wait = require "gulp-wait"
 browserifyReplace = require "browserify-replace"
 nib = require "nib"
 
@@ -86,6 +87,7 @@ gulp.task "buildVendorBundle", ["getVendorBundle"], ->
   .pipe vendor "vendor.js"
   vendorPipe = vendorPipe.pipe uglify() unless params.debug
   vendorPipe.pipe gulp.dest params.path.public
+  .pipe wait(1000)
   .pipe connect.reload()
   true
 
@@ -102,6 +104,7 @@ gulp.task "buildJade", ->
       locals: publicGlobals
   )
   .pipe gulp.dest params.path.public
+  .pipe wait(1000)
   .pipe connect.reload()
   true
 
@@ -118,6 +121,7 @@ gulp.task "buildStylus", ->
       'include css': true
   )
   .pipe gulp.dest params.path.public
+  .pipe wait(1000)
   .pipe connect.reload()
   true
 
@@ -135,7 +139,7 @@ gulp.task "buildCoffee", ->
     return unless typeof publicGlobals[upcasedBundleItem] is 'object'
     for key, val of publicGlobals[upcasedBundleItem]
       filename = camelCaseToDash(val).split('-')
-      filename.pop()
+      filename.pop() unless bundleItem is 'directive'
       angularBundleCode += "module.#{bundleItem} #{upcasedBundleItem}.#{key}, require(\"./app/#{bundleItem}/#{filename.join('-')}\")\n"
 
   Object.keys(require.cache).forEach (cacheItem)->
@@ -162,6 +166,7 @@ gulp.task "buildCoffee", ->
   )
   coffeePipe = coffeePipe.pipe uglify() unless params.debug
   coffeePipe.pipe gulp.dest params.path.public
+  .pipe wait(1000)
   .pipe connect.reload()
   true
 

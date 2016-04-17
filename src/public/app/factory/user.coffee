@@ -20,9 +20,9 @@ module.exports =
     @firebase.authWithOAuthPopup provider, @onAuthWithOAuthPopup
 
   logout: ->
-    @firebase.unauth()
     @resetUser()
-
+    @[FACTORY.FIREBASE].unauth()
+      
   resetUser: ->
     angular.extend @user, @userDefaults
 

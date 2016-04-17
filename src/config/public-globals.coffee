@@ -30,6 +30,21 @@ THEME:
 
 LOCAL_PROPERTY: "LocalProperty"
 LOCAL_METHOD: "LocalMethod"
+SCOPE: "Scope"
+
+###
+   Dashboard settings
+###
+DASHBOARD:
+  TABLE_WIDTH: 8 # table horizontal cells count
+
+  CELL:
+    HEIGHT: 90 #cell height (px)
+    SPACE: 10 #space between cells
+
+WIDGET:
+  TYPE:
+    CHART: 'chart'
 
 ###
   Angular bundle generator section
@@ -37,12 +52,15 @@ LOCAL_METHOD: "LocalMethod"
 FACTORY:
   FIREBASE: 'FirebaseFactory'
   USER: 'UserFactory'
+  DASHBOARD: 'DashboardFactory'
 
 CONTROLLER:
   # /app/controller/default-page.coffee file will be required
   DASHBOARD_PAGE: 'DashboardPageController'
   LOGIN_PAGE: 'LoginPageController'
 
-DIRECTIVE: {}
+DIRECTIVE:
+  TABLE: 'dashboardTable'
+  WIDGET: 'dashboardWidget'
 
 
