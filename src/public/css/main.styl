@@ -53,13 +53,16 @@ a.sourcecode-link
 .username
   padding-left 10px
 
+/*
+  DASHBOARD
+*/
+
 .dashboard-menu
   .md-mini
     border-radius 2px
 
 .dashboard-table
   max-width 1400px
-  background-color rgba(255, 255, 255, 0.2)
   width: 100%
   height: 100%
   padding 10px
@@ -68,7 +71,31 @@ a.sourcecode-link
 
 .dashboard-widget
   position absolute
-  background-color rgba(255, 255, 255, 0.5)
+  user-select none
+  user-drag none
+  &.moving, &.moving-remove
+    z-index 3
+
+  .dashboard-widget-front, .dashboard-widget-back
+    width: 100%
+    height: 100%
+    backface-visibility: hidden
+    overflow: hidden
+    position absolute
+
+    &.ng-hide-add
+      transform: perspective( 600px ) rotateX(0deg)
+      transition: transform .5s  ease
+      &-active
+        transform: perspective( 600px ) rotateX(180deg)
+    &.ng-hide-remove
+      transform: perspective( 600px ) rotateX(-180deg)
+      transition: transform .5s  ease
+      &-active
+        transform: perspective( 600px ) rotateX(0deg)
+
+  .dashboard-widget-back.flipped
+      transform: perspective( 600px ) rotateX(180deg)
 
   .dashboard-widget-menu
     .md-mini

@@ -1,22 +1,26 @@
 module.exports =
-    restrict: Triangle.DIRECTIVE_TYPE.ATTRIBUTE
-    inject: [FACTORY.DASHBOARD]
-    local:
-        scope:
-            dashboard: FACTORY.DASHBOARD
+  restrict: Triangle.DIRECTIVE_TYPE.ATTRIBUTE
+  inject: [FACTORY.DASHBOARD, FACTORY.FIREBASE]
+  local:
+    scope:
+      dashboard: FACTORY.DASHBOARD
+      loaded: FACTORY.FIREBASE
 
-        $window: null
-        $table: null
+    $window: null
+    $table: null
 
-        setCellsize: ->
-            @dashboard.cellWidth = @$table.width()/@dashboard.tableWidth
-            @dashboard.cellInnerWidth = @dashboard.cellWidth - @dashboard.cellSpace
-            @$scope.$apply() unless @$scope.$$phase
+    setCellsize: ->
+      @dashboard.cellWidth = @$table.width() / @dashboard.tableWidth
+      @dashboard.cellInnerWidth = @dashboard.cellWidth - @dashboard.cellSpace
+      @$scope.$apply() unless @$scope.$$phase
 
-    link: ->
-        @$window = $ window
-        @$table = @$element.find '.jsDashboardTableBody'
+    onLoadedWidgets: (loaded)->
+      setTimeout(@setCellsize, 0) if loaded
+    watch:
+      'loaded.widgets': 'onLoadedWidgets'
 
-        @$window.resize _.throttle(@setCellsize, 500, true)
 
-        @setCellsize()
+  link: ->
+    @$window = $ window
+    @$table = @$element.find '.jsDashboardTableBody'
+    @$window.resize _.throttle(@setCellsize, 500, true)

@@ -43,6 +43,8 @@ DASHBOARD:
     SPACE: 10 #space between cells
 
 WIDGET:
+  MIN_WIDTH: 2
+  MIN_HEIGHT: 2
   TYPE:
     CHART: 'chart'
 
@@ -62,5 +64,6 @@ CONTROLLER:
 DIRECTIVE:
   TABLE: 'dashboardTable'
   WIDGET: 'dashboardWidget'
+  WIDGET_CHART: 'dashboardWidgetChart'
 
 

@@ -32,7 +32,6 @@ md-content.md-hue-1.main-content(layout="column")
 
 
   md-content.md-hue-1.background-image(flex, layout="column", layout-align="top center", style='height: 100%')
-    .dashboard-table(dashboard-table)
+    .dashboard-table.animation-opacity(dashboard-table, ng-show="loaded.widgets")
       .jsDashboardTableBody.dashboard-table-body
-        dashboard-widget(widget='widget' ng-repeat='widget in db.widgets')
-          |{{widget}}
+        dashboard-widget(widget='widget', ng-repeat='widget in db.widgets')

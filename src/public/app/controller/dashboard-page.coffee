@@ -5,6 +5,7 @@ module.exports =
       user: FACTORY.USER
       dashboard: FACTORY.DASHBOARD
       db: FACTORY.FIREBASE
+      loaded: FACTORY.FIREBASE
       addWidget: LOCAL_METHOD
 
     addWidget: (type)->
