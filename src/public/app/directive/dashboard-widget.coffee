@@ -1,130 +1,166 @@
 module.exports =
-  restrict: Triangle.DIRECTIVE_TYPE.ELEMENT
-  inject: [
-    "#{FACTORY.DASHBOARD} as DashboardFactory"
-    "$document"
-  ]
-  templateUrl: "template-#{DIRECTIVE.WIDGET}"
-  scope:
-    widget: '='
-  local:
+    restrict: Triangle.DIRECTIVE_TYPE.ELEMENT
+    inject: [
+        "#{FACTORY.DASHBOARD} as DashboardFactory"
+        "$document"
+    ]
+    templateUrl: "template-#{DIRECTIVE.WIDGET}"
     scope:
-      widget: SCOPE
-      flag: LOCAL_PROPERTY
-      dashboard: FACTORY.DASHBOARD
+        widget: '='
+    local:
+        scope:
+            widget: SCOPE
+            flag: LOCAL_PROPERTY
+            dashboard: FACTORY.DASHBOARD
+            remove: FACTORY.DASHBOARD
 
-    flag:
-      animated: true
-      flipped: false
-      showControls: false
-      dial: false
-      moving: false
+        flag:
+            animated: true
+            flipped: false
+            showControls: false
+            dial: false
+            resizeMode: false
+            fullScreen: false
 
+        $body: null
+        movingWidget: {}
 
-    $body: null
-    onWidgetCoordinatesChange: ->
-      return unless @flag.animated
-      xy = @DashboardFactory.getRealXY @widget.x, @widget.y
-      wh = @DashboardFactory.getRealWH @widget.w, @widget.h
+        onWidgetCoordinatesChange: ->
+            return unless @flag.animated
+            xy = @DashboardFactory.getRealXY @widget.x, @widget.y
+            wh = @DashboardFactory.getRealWH @widget.w, @widget.h
 
-      @$widget.css
-        left: xy.x
-        top: xy.y
-        width: wh.w
-        height: wh.h
+            @$widget.css
+                left: xy.x
+                top: xy.y
+                width: wh.w
+                height: wh.h
 
+        onWidgetTypeChange: ->
+            tagName = "dashboard-widget-#{@widget.type.toLowerCase()}"
+            el = @parent.$compile("<#{tagName}></#{tagName}>")(@$scope)
+            @$body.html el
 
+            setTimeout (=>
+                @$widget
+                .addClass('animation-xy-hw')
+                .find('.opaque')
+                .removeClass('opaque')
+            ), 1000
 
-    onWidgetTypeChange: ->
-      tagName = "dashboard-widget-#{@widget.type.toLowerCase()}"
-      el = @parent.$compile("<#{tagName}></#{tagName}>")(@$scope)
-      @$body.html el
-      setTimeout (=>@$body.find(".jsDashboardWidgetBack").removeClass('flipped')), 100
-      
-    onMouseUp: ->
-      @$document.off 'mousemove', @onMouseMove
-      @$document.off 'mouseup', @onMouseUp
-      @flag.animated = true
-      @$widget.addClass 'animation-xy-hw'
-      @size = null if @size
-      @onWidgetCoordinatesChange()
-      @DashboardFactory.save()
+        onMouseUp: ->
+            @$document.off 'mousemove', @onMouseMove
+            @$document.off 'mouseup', @onMouseUp
+            @flag.animated = true
+            @flag.resizeMode = false
+            @$widget.addClass 'animation-xy-hw'
+            @onWidgetCoordinatesChange()
+            @removeHighZIndex()
+            @DashboardFactory.saveAll()
 
-    onMouseMove: (e)->
-      x = e.pageX - @startX
-      y = e.pageY - @startY
-    
-      if @size
-        return
-        maxWidth = dashboard.tableWidth * @dashboard.cellWidth - @size.w
-        x = maxWidth if x > maxWidth
-        maxWidth = dashboard.tableWidth * @dashboard.cellWidth - @size.w
-    
-        minWidth = @dashboard.cellWidth * 2 - @size.w - CELL.SPACE
-        x = minWidth if x<minWidth
-    
-        minHeight = CELL.INNER_Y - @size.h
-        y = minHeight if y<minHeight
-    
-        wh = @getTableWH @size.w + x - @size.x, @size.h + y - @size.y
-        return if wh.w<2 or wh.h<1
-        @$widget.css
-          width: @size.w + x - @size.x
-          height: @size.h + y - @size.y
-    
-        if wh.w isnt @widget.w or wh.h isnt @widget.h
-          @widget.w = wh.w
-          @widget.h = wh.h
-          @DashboardFactory.getCollision @widget, @preparedWidgets
-          setTimeout @widget.redraw, 100
-      else
-        x = 0 if x < 0
-        y = 0 if y < 0
-    
-        maxWidth = (@dashboard.tableWidth - @widget.w) * @dashboard.cellWidth
-        x = maxWidth if x > maxWidth
-    
-        tableXY = @DashboardFactory.getTableXY x, y
-        @widget.x = tableXY.x
-        @widget.y = tableXY.y
-    
-        if tableXY.x isnt @savedX or tableXY.y isnt @savedY
-          @savedX = tableXY.x
-          @savedY = tableXY.y
-          @DashboardFactory.getCollision @widget, @preparedWidgets
-    
-        @$widget.css
-          left: x
-          top: y
-      
-    onMouseDown: (e)->
-      return if e.button # left button is 0
-      @flag.animated = false
-      @$widget.removeClass 'animation-xy-hw'
+        onMouseMove: (e)->
+            x = e.pageX - @movingWidget.startX
+            y = e.pageY - @movingWidget.startY
 
-      @preparedWidgets = @DashboardFactory.prepareWidgetsData @widget
+            if @flag.resizeMode
+                widgetW = @movingWidget.realW + x
+                widgetH = @movingWidget.realH + y
 
-      @savedX = @widget.x
-      @savedY = @widget.y
+                widgetW = @movingWidget.maxW if widgetW > @movingWidget.maxW
+                widgetW = @dashboard.widgetMinWidth if widgetW < @dashboard.widgetMinWidth
+                widgetH = @dashboard.widgetMinHeight if widgetH < @dashboard.widgetMinHeight
 
-      position = @$widget.position()
-      @startX = e.pageX - position.left
-      @startY = e.pageY - position.top
+                tableWH = @DashboardFactory.getTableWH widgetW, widgetH
 
-      @$document.on 'mousemove', @onMouseMove
-      @$document.on 'mouseup', @onMouseUp
+                unless tableWH.w is @widget.w and tableWH.h is @widget.h
+                    @widget.w = tableWH.w
+                    @widget.h = tableWH.h
+                    @DashboardFactory.getCollision @widget, @preparedWidgets
+                #redraw
+                @$widget.css
+                    width: widgetW
+                    height: widgetH
+            else
+                widgetX = @movingWidget.realX + x
+                widgetY = @movingWidget.realY + y
 
-    watch:
-      'widget.type': 'onWidgetTypeChange'
-      'flag.dial': ->
-        @flag.dial = true if @flag.showControls
-      '[widget.x, widget.y, widget.w, widget.h, dashboard]': 'onWidgetCoordinatesChange'
-  events:
-    'click .jsMoveWidgetMode': 'moveWidgetMode'
-    'mousedown .jsWidgetResize': 'onResizeStart'
-    'mousedown': 'onMouseDown'
+                widgetX = 0 if widgetX < 0
+                widgetY = 0 if widgetY < 0
+                widgetX = @movingWidget.maxX if widgetX > @movingWidget.maxX
 
-  link: ->
-    @$widget = @$element.find ".jsDashboardWidget"
-    @$body = @$element.find ".jsDashboardWidgetBody"
-    @widget.$move = @onWidgetCoordinatesChange
+                tableXY = @DashboardFactory.getTableXY widgetX, widgetY
+
+                unless tableXY.x is @widget.x and tableXY.y is @widget.y
+                    @widget.x = tableXY.x
+                    @widget.y = tableXY.y
+                    @DashboardFactory.getCollision @widget, @preparedWidgets
+
+                @$widget.css
+                    left: widgetX
+                    top: widgetY
+
+        onResizeStart: ->
+            @flag.resizeMode = true
+
+        onMouseDown: (e)->
+            return if @flag.fullScreen || e.button # left button is 0
+            @$widget.addClass 'high-z-index'
+            @flag.animated = false
+            @$widget.removeClass 'animation-xy-hw'
+
+            @preparedWidgets = @DashboardFactory.prepareWidgetsData @widget
+
+            @startWidgetX = @widget.x
+            @startWidgetY = @widget.y
+
+            xy = @DashboardFactory.getRealXY @widget.x, @widget.y
+            wh = @DashboardFactory.getRealWH @widget.w, @widget.h
+
+            angular.extend @movingWidget,
+                startX: e.pageX
+                startY: e.pageY
+                x: @widget.x
+                y: @widget.y
+                w: @widget.w
+                h: @widget.h
+                realX: xy.x
+                realY: xy.y
+                realW: wh.w
+                realH: wh.h
+                maxX: @dashboard.tableRealWidth - wh.w
+                maxW: @dashboard.tableRealWidth - xy.x
+
+            @$document.on 'mousemove', @onMouseMove
+            @$document.on 'mouseup', @onMouseUp
+
+        removeHighZIndex: ->
+            setTimeout (=>
+                @$widget.removeClass 'high-z-index'
+            ), 500
+        moveWidgetMode: (e)->
+            e.button = 0
+            @flag.showControls = false
+            @onMouseDown e
+
+        onFlagFullScreenChange: ->
+            if @flag.fullScreen
+                @$widget.addClass('high-z-index').css @dashboard.clientArea
+            else
+                setTimeout @onWidgetCoordinatesChange, 100
+                @removeHighZIndex()
+
+        watch:
+            'widget.type': 'onWidgetTypeChange'
+            'flag.dial': -> @flag.dial = true if @flag.showControls
+            '[widget.x, widget.y, widget.w, widget.h, dashboard.cellWidth]': 'onWidgetCoordinatesChange'
+            '[flag.fullScreen, dashboard.clientArea]': 'onFlagFullScreenChange'
+
+    events:
+        'click .jsMoveWidgetMode': 'moveWidgetMode'
+        'mousedown .jsWidgetResize': 'onResizeStart'
+        'mousedown .jsWidgetFullScreen': -> @flag.fullScreen = !@flag.fullScreen
+        'mousedown': 'onMouseDown'
+
+    link: ->
+        @$widget = @$element.find ".jsDashboardWidget"
+        @$body = @$element.find ".jsDashboardWidgetBody"

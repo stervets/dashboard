@@ -13,15 +13,15 @@ md-content.md-hue-1.main-content(layout="column")
               md-menu-item
                 md-button(ng-click="addWidget('chart')") Chart widget
 
-          md-button.md-button.md-icon-button(aria-label="Expand all widgets")
+          md-button.md-button.md-icon-button(aria-label="Expand all widgets", ng-click="expandWidgets()")
             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
               | Expand all widgets
             i.material-icons.md-24 view_stream
-          md-button.md-button.md-icon-button(aria-label="Collapse all widgets")
+          md-button.md-button.md-icon-button(aria-label="Collapse all widgets", ng-click="collapseWidgets()")
             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
               | Collapse all widgets
             i.material-icons.md-24 view_module
-          md-button.md-button.md-icon-button(aria-label="Collapse all widgets")
+          md-button.md-button.md-icon-button(aria-label="Align widgets", ng-click="arrangeWidgets()")
             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
               | Align widgets
             i.material-icons.md-24 dashboard
@@ -31,7 +31,7 @@ md-content.md-hue-1.main-content(layout="column")
         i.fa.fa-lg.fa-sign-out
 
 
-  md-content.md-hue-1.background-image(flex, layout="column", layout-align="top center", style='height: 100%')
+  md-content.md-hue-1.background-image.jsScroller(flex, layout="column", layout-align="top center", style='height: 100%')
     .dashboard-table.animation-opacity(dashboard-table, ng-show="loaded.widgets")
       .jsDashboardTableBody.dashboard-table-body
-        dashboard-widget(widget='widget', ng-repeat='widget in db.widgets')
+        dashboard-widget.animation-if-opacity(widget='widget', ng-repeat='widget in db.widgets')

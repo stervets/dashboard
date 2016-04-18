@@ -12,7 +12,7 @@ i
 
 md-tooltip
   color black
-
+/*
 a.sourcecode-link
   width 200px
   position fixed
@@ -27,6 +27,13 @@ a.sourcecode-link
   font-weight bold
   text-decoration none
   z-index 100
+*/
+
+.opaque
+  opacity: 0
+
+.high-z-index
+  z-index: 3
 
 .login-form
   height: 130px
@@ -74,6 +81,7 @@ a.sourcecode-link
   user-select none
   user-drag none
   &.moving, &.moving-remove
+    cursor move
     z-index 3
 
   .dashboard-widget-front, .dashboard-widget-back
@@ -93,9 +101,6 @@ a.sourcecode-link
       transition: transform .5s  ease
       &-active
         transform: perspective( 600px ) rotateX(0deg)
-
-  .dashboard-widget-back.flipped
-      transform: perspective( 600px ) rotateX(180deg)
 
   .dashboard-widget-menu
     .md-mini

@@ -1,7 +1,6 @@
 script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
-    .jsDashboardWidget.dashboard-widget.animation-xy-hw(
-      ng-class="{'moving': !flag.animated}",
-      ng-mouseenter="flag.showControls=flag.dial=true",
+    .jsDashboardWidget.dashboard-widget(
+      ng-mouseenter="flag.showControls=flag.dial=flag.animated",
       ng-mouseleave="flag.showControls=flag.dial=false"
     )
         .jsDashboardWidgetBody.dashboard-widget-body
@@ -12,32 +11,33 @@ script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
             )
                 md-fab-trigger
                 md-fab-actions
-                    md-button.md-fab.md-raised.md-mini(ng-click='a()')
-                        md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
-                            | Close {{flag.flipped?"widget options":"widget"}}
-                        i.material-icons.md-24 close
-
-                    md-button.md-fab.md-raised.md-mini(ng-click='flag.flipped=!flag.flipped')
-                        md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
-                            | {{flag.flipped?"Close":"Open"}} widget options
-                        i.material-icons.md-24 settings
-
-                    md-button.md-fab.md-raised.md-mini(ng-click='a()')
-                        md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
-                            | Moving mode
-                        i.material-icons.md-24 open_with
+                    span.animation-opacity(ng-show="!flag.fullScreen")
+                        md-button.md-fab.md-raised.md-mini(ng-click='remove(widget)')
+                            md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+                                | Close {{flag.flipped?"widget options":"widget"}}
+                            i.material-icons.md-24 close
+                    span.animation-opacity(ng-show="!flag.fullScreen")
+                        md-button.md-fab.md-raised.md-mini(ng-click='flag.flipped=!flag.flipped')
+                            md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+                                | {{flag.flipped?"Close":"Open"}} widget options
+                            i.material-icons.md-24 settings
+                    span.animation-opacity(ng-show="!flag.fullScreen")
+                        md-button.md-fab.md-raised.md-mini.jsMoveWidgetMode
+                            md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+                                | Moving mode
+                            i.material-icons.md-24 open_with
                     span.animation-opacity(ng-show="!flag.flipped")
-                      md-button.md-fab.md-raised.md-mini(ng-click='a()')
+                      md-button.md-fab.md-raised.md-mini.jsWidgetFullScreen
                           md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
                               | View full screen
                           i.material-icons.md-24 aspect_ratio
-        .dashboard-widget-resizer.animation-if-opacity(ng-if="flag.showControls")
+
+        .jsWidgetResize.dashboard-widget-resizer.animation-opacity.opaque(ng-show="flag.showControls && !flag.fullScreen")
             i.material-icons.md-24 network_cell
 
-
 script(id="template-#{DIRECTIVE.WIDGET_CHART}", type="text/ng-template")
-  md-content.md-whiteframe-5dp.md-hue-1.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
-  md-content.md-whiteframe-5dp.md-hue-3.jsDashboardWidgetBack.dashboard-widget-back.flipped(ng-show="flag.flipped")
+  md-content.md-hue-1.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
+  md-content.md-hue-3.jsDashboardWidgetBack.dashboard-widget-back.opaque(ng-show="flag.flipped")
     md-toolbar(layout="row", layout-align="top")
       .md-toolbar-tools
         | Chart options

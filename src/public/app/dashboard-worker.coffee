@@ -13,7 +13,7 @@ class DashboardWorker
 # Get free place for widget
   getFreePlace: (w, widgets, tableWidth)->
     if w.w > tableWidth
-      console.warn "Error: widget '#{w.id} width (#{w.w}) > table width (#{tableWidth})'"
+      console.warn "Error: widget '#{w.$id} width (#{w.w}) > table width (#{tableWidth})'"
       return w
     for y in [0..0xFFFFFF]
       for x in [0..(tableWidth - w.w)]
@@ -63,7 +63,7 @@ class DashboardWorker
 # Close gaps between all widgets
     arrangeWidgets: (data)->
       @sortWidgets data.widgets, data.tableWidth
-      sliceIndex = if data.widget? then data.widgets.indexOf(_(data.widgets).findWhere(id: data.widget.id)) else 0
+      sliceIndex = if data.widget? then data.widgets.indexOf(_(data.widgets).findWhere($id: data.widget.$id)) else 0
       widgets = data.widgets.slice 0, sliceIndex
       for widgetIndex in [sliceIndex...data.widgets.length]
         widgets.push @getFreePlace(data.widgets[widgetIndex], widgets, data.tableWidth)

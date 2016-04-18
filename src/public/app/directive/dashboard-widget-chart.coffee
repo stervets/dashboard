@@ -8,4 +8,4 @@ module.exports =
       
       
   link: ->
-    console.log @widget
+    #console.log @widget

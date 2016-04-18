@@ -2,7 +2,7 @@ webworkify = require '../../../../vendor/webworkify'
 dashboardWorker = require '../dashboard-worker'
 
 module.exports =
-  inject: [FACTORY.FIREBASE, '$q']
+  inject: [FACTORY.FIREBASE, '$q', '$rootScope']
   dashboard:
     tableWidth: DASHBOARD.TABLE_WIDTH
     tableHeight: 0
@@ -11,14 +11,29 @@ module.exports =
     cellHeight: DASHBOARD.CELL.HEIGHT + DASHBOARD.CELL.SPACE
     cellInnerWidth: 0
     cellInnerHeight: DASHBOARD.CELL.HEIGHT
-
+    widgetMinWidth: 0
+    widgetMinHeight: WIDGET.MIN_HEIGHT * (DASHBOARD.CELL.HEIGHT + DASHBOARD.CELL.SPACE) - DASHBOARD.CELL.SPACE
+    scrollTo: null
+    clientArea:
+      top: 0
+      left: 0
+      width: 0
+      height: 0
+      
   worker: null
   defers: {}
   workerHandlers: {}
 
+  setCellsize: (tableWidthInPixels)->
+    @dashboard.cellWidth = tableWidthInPixels / @dashboard.tableWidth
+    angular.extend @dashboard,
+      cellInnerWidth: @dashboard.cellWidth - @dashboard.cellSpace
+      widgetMinWidth: (@dashboard.cellWidth * WIDGET.MIN_WIDTH) - @dashboard.cellSpace
+      tableRealWidth:  (@dashboard.cellWidth * @dashboard.tableWidth) - @dashboard.cellSpace
+
   prepareWidgetData: (widget)->
     return null unless widget?
-    id: widget.$id
+    $id: widget.$id
     x: widget.x
     y: widget.y
     w: widget.w
@@ -26,9 +41,7 @@ module.exports =
 
   prepareWidgetsData: (withoutThisWidget)->
     preparedWidgets = []
-    #widgets.forEach (widget)=>
-    for widget in @db.widgets when !withoutThisWidget or widget.id isnt withoutThisWidget.id
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>> test this
+    for widget in @db.widgets when !withoutThisWidget or widget.$id isnt withoutThisWidget.$id
       preparedWidgets.push @prepareWidgetData(widget)
     preparedWidgets
 
@@ -51,7 +64,7 @@ module.exports =
       widget: @prepareWidgetData widget
       widgets: @prepareWidgetsData widget
       tableWidth: @dashboard.tableWidth
-      scrollTo: widget.id
+      scrollTo: widget.$id
 
 # >>>>>>>>>>>>>>>>> why you need this?
 #    sortWidgets: -> @db.widgets.sort (a, b)->
@@ -62,13 +75,14 @@ module.exports =
 
 
   arrangeWidgets: (onlyAfterThisWidget)->
-    widget = @prepareWidget onlyAfterThisWidget
-    @postMessage
+    widget = @prepareWidgetData onlyAfterThisWidget
+    @postMessage(
       com: 'arrangeWidgets'
       widgets: @prepareWidgetsData()
       widget: widget # why without prepare ??
       tableWidth: @dashboard.tableWidth
       scrollTo: widget
+    ).then @saveAll
 
   registerWorkerHandler: (command, handler)->
     @workerHandlers[command] = [] unless @workerHandlers[command]?
@@ -83,13 +97,12 @@ module.exports =
     if @defers[data.deferId]
       @defers[data.deferId][(if data.error? then 'reject' else 'resolve')] data
 
-  getWidget: (id)-> @db.widgets.$getRecord id: id
+  getWidget: (widget)->
+    return if typeof widget is 'object' then widget else @db.widgets.$getRecord widget
 
-  addWidget: (params)->
-    widget = angular.extend params,
-      id: Triangle.genId()
+  addWidget: (widget)->
     @db.widgets.$add(widget).then (ref)=>
-      widget.$id = ref.key() # >>>>>>>>>>>>>>>>>>>>>>>> check with no ref
+      widget.$id = ref.key()
       @getFreePlace widget, @db.widgets
 
   getTableXY: (x, y)->
@@ -109,15 +122,22 @@ module.exports =
     h: Math.round(h / @dashboard.cellHeight)
 
   moveWidgets: (data)->
+    @dashboard.scrollTo = data.scrollTo if data.scrollTo
     for widgetData in data.widgets
-      widget = @db.widgets.$getRecord widgetData.id
-      angular.extend widget, widgetData
-      widget.$move()
-
-  save: ->
+      angular.extend @getWidget(widgetData.$id), widgetData
+    @$rootScope.$apply()
+    
+  saveAll: ->
     for widget in @db.widgets
       @db.widgets.$save widget
-    console.log 'saved'
+
+  save: (widget)->
+    @db.widgets.$save @getWidget(widget)
+
+  remove: (widget)->
+    widget = @getWidget widget
+    @db.widgets.$remove(widget).then =>
+      @arrangeWidgets()
 
   init: ->
     @db = @[FACTORY.FIREBASE].db
