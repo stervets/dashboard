@@ -16,7 +16,7 @@ module.exports =
         top: @dashboard.cellSpace-tablePosition.top
         width: @$scroller.width()-@dashboard.cellSpace*2
         height: @$scroller.height()-@dashboard.cellSpace*2
-      @DashboardFactory.setCellsize @$table.width()
+      @DashboardFactory.setCellsize @$table.width()+@dashboard.cellSpace
       @$scope.$apply() unless @$scope.$$phase
 
     onLoadedWidgets: (loaded)->
