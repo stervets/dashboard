@@ -36,7 +36,9 @@ script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
             i.material-icons.md-24 network_cell
 
 script(id="template-#{DIRECTIVE.WIDGET_CHART}", type="text/ng-template")
-  md-content.md-hue-1.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
+  md-content.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
+    .jsViewHighChart.highchart-container.animation-opacity-on-show(ng-show='!flag.hideContent')
+
   md-content.md-hue-3.jsDashboardWidgetBack.dashboard-widget-back.opaque(ng-show="flag.flipped")
     md-toolbar(layout="row", layout-align="top")
       .md-toolbar-tools

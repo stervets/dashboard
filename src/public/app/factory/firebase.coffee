@@ -8,7 +8,6 @@ module.exports =
 
   onLoadedFirebaseEntity: (name)->
     (entity)=>
-      #console.log entity
       @db[name] = entity
       @loaded[name] = true
 

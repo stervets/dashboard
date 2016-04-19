@@ -55,6 +55,7 @@ FACTORY:
   FIREBASE: 'FirebaseFactory'
   USER: 'UserFactory'
   DASHBOARD: 'DashboardFactory'
+  DATA_MANAGER: 'DataManagerFactory'
 
 CONTROLLER:
   # /app/controller/default-page.coffee file will be required

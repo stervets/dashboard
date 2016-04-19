@@ -24,5 +24,12 @@ ANIMATION_SPEED = .3s
     &-active
       opacity: 0
 
+.animation-opacity-on-show
+  &.ng-hide-remove
+    opacity: 0
+    transition: opacity ANIMATION_SPEED ease
+    &-active
+      opacity: 1
+
 .animation-xy-hw
   transition: top ANIMATION_SPEED ease, left ANIMATION_SPEED ease, width ANIMATION_SPEED ease, height ANIMATION_SPEED ease

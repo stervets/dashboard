@@ -3,6 +3,7 @@ module.exports =
     inject: [
         "#{FACTORY.DASHBOARD} as DashboardFactory"
         "$document"
+        "$timeout"
     ]
     templateUrl: "template-#{DIRECTIVE.WIDGET}"
     scope:
@@ -21,9 +22,14 @@ module.exports =
             dial: false
             resizeMode: false
             fullScreen: false
+            hideContent: false
 
         $body: null
         movingWidget: {}
+
+        redraw: ->
+            @$timeout (=>@flag.hideContent = false), 400
+            setTimeout (=>@$scope.$emit('redraw')), 400
 
         onWidgetCoordinatesChange: ->
             return unless @flag.animated
@@ -35,6 +41,7 @@ module.exports =
                 top: xy.y
                 width: wh.w
                 height: wh.h
+            @redraw()
 
         onWidgetTypeChange: ->
             tagName = "dashboard-widget-#{@widget.type.toLowerCase()}"
@@ -76,10 +83,11 @@ module.exports =
                     @widget.w = tableWH.w
                     @widget.h = tableWH.h
                     @DashboardFactory.getCollision @widget, @preparedWidgets
-                #redraw
+
                 @$widget.css
                     width: widgetW
                     height: widgetH
+
             else
                 widgetX = @movingWidget.realX + x
                 widgetY = @movingWidget.realY + y
@@ -100,6 +108,7 @@ module.exports =
                     top: widgetY
 
         onResizeStart: ->
+            @flag.hideContent = true
             @flag.resizeMode = true
 
         onMouseDown: (e)->
@@ -144,8 +153,11 @@ module.exports =
 
         onFlagFullScreenChange: ->
             if @flag.fullScreen
+                @flag.hideContent = true
                 @$widget.addClass('high-z-index').css @dashboard.clientArea
+                @redraw()
             else
+                @flag.hideContent = true
                 setTimeout @onWidgetCoordinatesChange, 100
                 @removeHighZIndex()
 

@@ -28,7 +28,10 @@
     "firebase": "~2.4.2",
     "angularfire": "~1.2.0",
     "angular-material-icons": "~0.7.0",
-    "webworkify": "https://github.com/substack/webworkify.git#~1.1.0"
+    "webworkify": "https://github.com/substack/webworkify.git#~1.1.0",
+    "highcharts": "~4.2.4",
+    "socket": "https://github.com/socketio/socket.io-client",
+    "socket.io-client": "https://github.com/socketio/socket.io-client.git#~1.4.5"
   },
   "resolutions": {
     "underscore": "^1.8.3",

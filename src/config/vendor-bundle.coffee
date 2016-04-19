@@ -9,4 +9,7 @@
   'triangle/triangle.min.js'
   'firebase'
   'angularfire'
+  'sockjs-client'
+  'highcharts'
+  'highcharts/themes/dark-blue.js'
 ]
