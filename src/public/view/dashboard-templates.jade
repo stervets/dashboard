@@ -1,7 +1,7 @@
 script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
     .jsDashboardWidget.dashboard-widget(
-      ng-mouseenter="flag.showControls=flag.dial=flag.animated",
-      ng-mouseleave="flag.showControls=flag.dial=false"
+    ng-mouseenter="flag.showControls=flag.dial=flag.animated",
+    ng-mouseleave="flag.showControls=flag.dial=false"
     )
         .jsDashboardWidgetBody.dashboard-widget-body
         .dashboard-widget-menu
@@ -12,7 +12,7 @@ script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
                 md-fab-trigger
                 md-fab-actions
                     span.animation-opacity(ng-show="!flag.fullScreen")
-                        md-button.md-fab.md-raised.md-mini(ng-click='remove(widget)')
+                        md-button.md-fab.md-raised.md-mini(ng-click='remove()')
                             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
                                 | Close {{flag.flipped?"widget options":"widget"}}
                             i.material-icons.md-24 close
@@ -27,19 +27,53 @@ script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
                                 | Moving mode
                             i.material-icons.md-24 open_with
                     span.animation-opacity(ng-show="!flag.flipped")
-                      md-button.md-fab.md-raised.md-mini.jsWidgetFullScreen
-                          md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
-                              | View full screen
-                          i.material-icons.md-24 aspect_ratio
+                        md-button.md-fab.md-raised.md-mini.jsWidgetFullScreen
+                            md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+                                | View full screen
+                            i.material-icons.md-24 aspect_ratio
 
         .jsWidgetResize.dashboard-widget-resizer.animation-opacity.opaque(ng-show="flag.showControls && !flag.fullScreen")
             i.material-icons.md-24 network_cell
 
 script(id="template-#{DIRECTIVE.WIDGET_CHART}", type="text/ng-template")
-  md-content.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
-    .jsViewHighChart.highchart-container.animation-opacity-on-show(ng-show='!flag.hideContent')
+    md-content.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
+        .jsViewHighChart.highchart-container.animation-opacity-on-show(ng-show='!flag.hideContent')
+    md-content.md-hue-3.jsDashboardWidgetBack.dashboard-widget-back(ng-show="flag.flipped")
+        md-toolbar(layout="row", layout-align="top") Chart options
+        md-content.md-hue-1
+            div(layout-gt-sm="row")
+                    md-input-container.opaque.md-block(flex-gt-sm)
+                        label Chart title
+                        input(ng-model="widget.data.name")
+                    md-input-container.md-block.md-hue-1(flex-gt-sm)
+                        label Currency
+                        md-select(ng-model="widget.data.currency").md-hue-1
+                            md-option.md-hue-1(ng-repeat="channelName in channelNames track by $index", value="{{channels[$index]}}") {{channelName}}
+                    md-input-container.md-block(flex-gt-sm)
+                        label Chart type
+                        md-select(ng-model="widget.data.type").md-hue-1
+                            md-option.md-hue-1(ng-repeat="chartType in chartTypes", value="{{chartType}}") {{chartType}}
+            md-button.md-raised.md-primary(ng-click="saveOptions()") ok
 
-  md-content.md-hue-3.jsDashboardWidgetBack.dashboard-widget-back.opaque(ng-show="flag.flipped")
-    md-toolbar(layout="row", layout-align="top")
-      .md-toolbar-tools
-        | Chart options
+script(id="template-#{DIRECTIVE.WIDGET_VALUE}", type="text/ng-template")
+    md-content.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
+        | {{widget.data.name}}
+        | {{value.new}}
+    md-content.md-hue-3.jsDashboardWidgetBack.dashboard-widget-back(ng-show="flag.flipped")
+        md-toolbar(layout="row", layout-align="top") Set currency
+        md-content.md-hue-1
+            div(layout-gt-sm="row")
+                md-input-container.md-block.md-hue-1(flex-gt-sm)
+                    label Currency
+                    md-select(ng-model="widget.data.currency").md-hue-1
+                        md-option.md-hue-1(ng-repeat="channelName in channelNames track by $index", value="{{channels[$index]}}") {{channelName}}
+            md-button.md-raised.md-primary(ng-click="saveOptions()") ok
+
+script(id="template-#{DIRECTIVE.WIDGET_CHAT}", type="text/ng-template")
+    md-content.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
+        | Chat
+
+
+script(id="template-#{DIRECTIVE.WIDGET_ABOUT}", type="text/ng-template")
+    md-content.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
+        | Welcome

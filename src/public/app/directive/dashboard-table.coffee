@@ -5,6 +5,7 @@ module.exports =
     scope:
       dashboard: FACTORY.DASHBOARD
       loaded: FACTORY.FIREBASE
+      chartWidgets: []
 
     $window: null
     $table: null
@@ -32,6 +33,7 @@ module.exports =
       'dashboard.scrollTo': 'onDashboardScrollToChange'
 
   link: ->
+    #@chartWidgets = CHANNEL.map
     @$window = $ window
     @$table = @$element.find '.jsDashboardTableBody'
     @$scroller = $ '.jsScroller'

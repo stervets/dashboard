@@ -14,7 +14,10 @@ APPLICATION:
   ]
 
 # firebase db address
-FIREBASE_ADDR: 'https://deeprest-dashboard.firebaseio.com'
+FIREBASE_ADDR: "https://deeprest-dashboard.firebaseio.com"
+
+# websocket data-server address
+SOCKET_ADDR: "http://dashboard-data.deeprest.ru"
 
 # pages with no auth required
 PUBLIC_PAGES: [
@@ -47,6 +50,34 @@ WIDGET:
   MIN_HEIGHT: 2
   TYPE:
     CHART: 'chart'
+    VALUE: 'value'
+    CHAT: 'chat'
+    ABOUT: 'about'
+
+###
+    Socket commands
+###
+SOCKET:
+  SUBSCRIBE: 'subscribe'
+  UNSUBSCRIBE: 'unsubscribe'
+  DATA: 'data'
+
+###
+    Dta channels
+###
+CHANNEL:
+  EURUSD: 'EURUSD'
+  EURJPY: 'EURJPY'
+  USDJPY: 'USDJPY'
+  USDCAD: 'USDCAD'
+  AUDUSD: 'AUDUSD'
+  GBPUSD: 'GBPUSD'
+
+###
+   Chart options
+###
+DATA_CACHE: 100 #records amount stored in cache
+CHART_TYPES: ['area', 'areaspline', 'line', 'bar', 'spline']
 
 ###
   Angular bundle generator section
@@ -66,5 +97,8 @@ DIRECTIVE:
   TABLE: 'dashboardTable'
   WIDGET: 'dashboardWidget'
   WIDGET_CHART: 'dashboardWidgetChart'
+  WIDGET_VALUE: 'dashboardWidgetValue'
+  WIDGET_CHAT: 'dashboardWidgetChat'
+  WIDGET_ABOUT: 'dashboardWidgetAbout'
 
 

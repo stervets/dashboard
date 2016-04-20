@@ -10,6 +10,7 @@
   'firebase'
   'angularfire'
   'sockjs-client'
+  'js-md5/js/md5.js'
   'highcharts'
   'highcharts/themes/dark-blue.js'
 ]

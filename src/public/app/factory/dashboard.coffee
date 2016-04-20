@@ -1,6 +1,10 @@
 webworkify = require '../../../../vendor/webworkify'
 dashboardWorker = require '../dashboard-worker'
 
+channels = Object.keys(CHANNEL).map (key)->CHANNEL[key]
+channelNames = channels.map (channel)->
+  channel.slice(0,3)+"/"+channel.slice(3)
+
 module.exports =
   inject: [FACTORY.FIREBASE, '$q', '$rootScope']
   dashboard:
@@ -19,10 +23,27 @@ module.exports =
       left: 0
       width: 0
       height: 0
-      
+  
+  channels: channels
+  channelNames: channelNames
+  
   worker: null
   defers: {}
   workerHandlers: {}
+
+  generatedColorsCache: {}
+  getColorFromString: (name='', dark=false)->
+    name='default' unless name
+    unless @generatedColorsCache[name]?
+      hash = md5(name)
+      divider = (hash.length)/3
+      rgb = []
+      for i in [0...hash.length]
+        index = Math.floor(i/divider)
+        rgb[index] ||= 0
+        rgb[index]=(if dark then 15 else 50)+((rgb[index]+hash.charCodeAt(i)*5) % 200)
+      @generatedColorsCache[name] = '#'+rgb[2].toString(16)+rgb[1].toString(16)+rgb[0].toString(16)
+    @generatedColorsCache[name]
 
   setCellsize: (tableWidthInPixels)->
     @dashboard.cellWidth = tableWidthInPixels / @dashboard.tableWidth
@@ -66,14 +87,6 @@ module.exports =
       tableWidth: @dashboard.tableWidth
       scrollTo: widget.$id
 
-# >>>>>>>>>>>>>>>>> why you need this?
-#    sortWidgets: -> @db.widgets.sort (a, b)->
-#        aa = a.y * @dashboard.tableWidth + a.x
-#        bb = b.y * @dashboard.tableWidth + b.x
-#        return 0 if aa is bb
-#        return if aa < bb then -1 else 1
-
-
   arrangeWidgets: (onlyAfterThisWidget)->
     widget = @prepareWidgetData onlyAfterThisWidget
     @postMessage(
@@ -103,7 +116,8 @@ module.exports =
   addWidget: (widget)->
     @db.widgets.$add(widget).then (ref)=>
       widget.$id = ref.key()
-      @getFreePlace widget, @db.widgets
+      @getFreePlace(widget, @db.widgets).then =>
+        @save widget.$id
 
   getTableXY: (x, y)->
     x: Math.round(x / @dashboard.cellWidth)

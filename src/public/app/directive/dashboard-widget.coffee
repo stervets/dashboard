@@ -13,7 +13,7 @@ module.exports =
             widget: SCOPE
             flag: LOCAL_PROPERTY
             dashboard: FACTORY.DASHBOARD
-            remove: FACTORY.DASHBOARD
+            remove: LOCAL_METHOD
 
         flag:
             animated: true
@@ -23,10 +23,19 @@ module.exports =
             resizeMode: false
             fullScreen: false
             hideContent: false
+            canResize: true
+            options: true
 
         $body: null
         movingWidget: {}
-
+        
+        remove: ->
+            if @flag.flipped
+                @flag.flipped = false
+            else
+                @$scope.$emit 'remove'
+                @DashboardFactory.remove @widget
+            
         redraw: ->
             @$timeout (=>@flag.hideContent = false), 400
             setTimeout (=>@$scope.$emit('redraw')), 400
