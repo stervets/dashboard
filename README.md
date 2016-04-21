@@ -31,4 +31,5 @@ http://dashboard.deeprest.ru
 
 ### Notes
 > Application has a "developing" status and better viewing with Google chrome, Firefox and Safary. Other browsers may contain problems with view.
+
 > This project uses small-known library "TriangleJS". It's not framework over framework. It's just a syntax sugar, that makes code look more OOP-styled and lets escape from angular's callback-hell.
