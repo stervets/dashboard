@@ -113,11 +113,12 @@ module.exports =
   getWidget: (widget)->
     return if typeof widget is 'object' then widget else @db.widgets.$getRecord widget
 
-  addWidget: (widget)->
+  addWidget: (widget, getNoFreePlace)->
     @db.widgets.$add(widget).then (ref)=>
       widget.$id = ref.key()
-      @getFreePlace(widget, @db.widgets).then =>
-        @save widget.$id
+      unless getNoFreePlace?
+        @getFreePlace(widget, @db.widgets).then =>
+          @save widget.$id
 
   getTableXY: (x, y)->
     x: Math.round(x / @dashboard.cellWidth)

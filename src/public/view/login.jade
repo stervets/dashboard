@@ -4,6 +4,7 @@ md-content.md-hue-1.main-content(layout="column")
             h1 Dashboard demo application
 
     md-content.md-hue-1.background-image(flex, layout="row", layout-align="center center", style='height: 100%')
+
         md-whiteframe.md-whiteframe-5dp.animation-opacity(ng-show='canShowLoginForm && !user.authenticated')
             md-toolbar
                 .md-toolbar-tools
@@ -21,4 +22,8 @@ md-content.md-hue-1.main-content(layout="column")
                         i.fa.fa-lg.fa-github
                         | Github
 
+            md-content.disclaimer(layout="row")
+                    | * This demo application has a "developing" status and better viewing with following browsers:
+                    | Google chrome, Firefox and Safary.
+                    | Other browsers may contain problems with view
 

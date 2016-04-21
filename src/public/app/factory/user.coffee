@@ -17,6 +17,7 @@ module.exports =
     @$rootScope.$apply()
 
   authPopup: (provider)->
+    console.log provider
     @firebase.authWithOAuthPopup provider, @onAuthWithOAuthPopup
 
   logout: ->
@@ -25,7 +26,7 @@ module.exports =
       
   resetUser: ->
     angular.extend @user, @userDefaults
-
+    
   authUser: (authData)->
     return unless authData?.provider
     angular.extend @user,

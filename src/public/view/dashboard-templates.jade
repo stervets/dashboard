@@ -7,7 +7,8 @@ script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
         .dashboard-widget-menu
             md-fab-speed-dial.md-scale.md-fab-top-right(
             md-direction="left",
-            md-open="flag.dial"
+            md-open="flag.dial",
+            ng-hide="flag.flipped"
             )
                 md-fab-trigger
                 md-fab-actions
@@ -16,7 +17,7 @@ script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
                             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
                                 | Close {{flag.flipped?"widget options":"widget"}}
                             i.material-icons.md-24 close
-                    span.animation-opacity(ng-show="!flag.fullScreen")
+                    span.animation-opacity(ng-show="widget.options && !flag.fullScreen")
                         md-button.md-fab.md-raised.md-mini(ng-click='flag.flipped=!flag.flipped')
                             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
                                 | {{flag.flipped?"Close":"Open"}} widget options
@@ -26,13 +27,13 @@ script(id="template-#{DIRECTIVE.WIDGET}", type="text/ng-template")
                             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
                                 | Moving mode
                             i.material-icons.md-24 open_with
-                    span.animation-opacity(ng-show="!flag.flipped")
+                    span.animation-opacity(ng-show="widget.resize && !flag.flipped")
                         md-button.md-fab.md-raised.md-mini.jsWidgetFullScreen
                             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
                                 | View full screen
                             i.material-icons.md-24 aspect_ratio
 
-        .jsWidgetResize.dashboard-widget-resizer.animation-opacity.opaque(ng-show="flag.showControls && !flag.fullScreen")
+        .jsWidgetResize.dashboard-widget-resizer.animation-opacity.opaque(ng-show="widget.resize && flag.showControls && !flag.fullScreen")
             i.material-icons.md-24 network_cell
 
 script(id="template-#{DIRECTIVE.WIDGET_CHART}", type="text/ng-template")
@@ -57,8 +58,8 @@ script(id="template-#{DIRECTIVE.WIDGET_CHART}", type="text/ng-template")
 
 script(id="template-#{DIRECTIVE.WIDGET_VALUE}", type="text/ng-template")
     md-content.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
-        | {{widget.data.name}}
-        | {{value.new}}
+        .value-widget.name(ng-class="{'up': value.new>value.old, 'down': value.new<value.old}") {{widget.data.name}}
+        .value-widget.data(ng-class="{'up': value.new>value.old, 'down': value.new<value.old}") {{value.new}}
     md-content.md-hue-3.jsDashboardWidgetBack.dashboard-widget-back(ng-show="flag.flipped")
         md-toolbar(layout="row", layout-align="top") Set currency
         md-content.md-hue-1
@@ -70,10 +71,35 @@ script(id="template-#{DIRECTIVE.WIDGET_VALUE}", type="text/ng-template")
             md-button.md-raised.md-primary(ng-click="saveOptions()") ok
 
 script(id="template-#{DIRECTIVE.WIDGET_CHAT}", type="text/ng-template")
-    md-content.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
-        | Chat
+    md-content.jsDashboardWidgetFront.dashboard-widget-front(flex, layout="column")
 
+            md-list.md-content.jsChatScroll.chat-list
+                md-list-item.md-2-line(ng-repeat="message in params.messages | orderBy:'-time'",
+                ng-click="messageTo(message.author)",
+                ng-class="{selected: isSelected(message.text)}"
+                )
+
+                    .md-list-item-text(layout="column")
+                        .chat-list-item-header
+                            img.avatar(ng-src="{{message.avatar}}", alt="{{message.author}}")
+                            .author {{ message.author }}
+                        p {{ message.text }}
+
+            md-content.md-hue-3.chat-form
+                md-input-container.chat-input-container
+                    form(ng-submit="sendMessage()")
+                        label Enter message
+                        input.jsMessageInput(ng-model="params.text", required)
 
 script(id="template-#{DIRECTIVE.WIDGET_ABOUT}", type="text/ng-template")
     md-content.jsDashboardWidgetFront.dashboard-widget-front(ng-show="!flag.flipped")
-        | Welcome
+        .widget-about
+            .widget-about-title Welcome to demo dashboard applicaton
+            .widget-about-text
+                p
+                    | Try to drag or resize widgets or view it fullscreen
+                    | Also charts has a options button
+                p
+                    | Sourcecode located at&nbsp;
+                    a(href='https://github.com/stervets/dashboard', target='_blank') https://github.com/stervets/dashboard
+

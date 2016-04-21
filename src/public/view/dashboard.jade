@@ -11,14 +11,13 @@ md-content.md-hue-1.main-content(layout="column")
               | add Widget
             md-menu-content.md-hue-2
               md-menu-item(ng-repeat="chartName in chartNames track by $index")
-                md-button(ng-click="addChartWidget(chartName, channels[$index])") Chart "{{chartName}}"
+                md-button.add-widget-menu-item(ng-click="addChartWidget(chartName, channels[$index])") Chart "{{chartName}}"
+                md-button.add-widget-menu-item(ng-click="addValueWidget($index)") Value "{{chartName}}"
               md-menu-divider
               md-menu-item
-                md-button(ng-click="addValueWidget()") Value
+                md-button.add-widget-menu-item(ng-click="addChatWidget()") Chat
               md-menu-item
-                md-button(ng-click="addChatWidget()") Chat
-              md-menu-item
-                md-button(ng-click="addAboutWidget()") About
+                md-button.add-widget-menu-item(ng-click="addAboutWidget()") About
           md-button.md-button.md-icon-button(aria-label="Expand all widgets", ng-click="expandWidgets()")
             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
               | Expand all widgets
@@ -31,13 +30,18 @@ md-content.md-hue-1.main-content(layout="column")
             md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
               | Align widgets
             i.material-icons.md-24 dashboard
+          md-button.md-button.md-icon-button(aria-label="Reset to default", ng-click="resetToDefault()")
+            md-tooltip(md-direction='bottom', md-visible='tooltipVisible', md-autohide='false')
+              | Reset to default
+            i.material-icons.md-24 rotate_right
+
       img.avatar(ng-src="{{user.avatar}}", alt="{{user.name}}")
       span.md-body-2.username {{user.name}}
       a.md-button.md-icon-button(href="/#/login")
-        i.fa.fa-lg.fa-sign-out
+        i.material-icons.md-24 exit_to_app
 
 
-  md-content.md-hue-1.background-image.jsScroller(flex, layout="column", layout-align="top center", style='height: 100%')
+  md-content.md-hue-1.background-image.jsScroller(flex, layout="column", layout-align="top center")
     .dashboard-table.animation-opacity(dashboard-table, ng-show="loaded.widgets")
       .jsDashboardTableBody.dashboard-table-body
         dashboard-widget.animation-if-opacity(widget='widget', ng-repeat='widget in db.widgets')

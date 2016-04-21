@@ -27,13 +27,12 @@ module.exports =
         return unless @dashboard.scrollTo
         if widget = @DashboardFactory.getWidget @dashboard.scrollTo
           @$scroller.animate scrollTop: @DashboardFactory.getRealXY(0, widget.y).y , 'slow'
-      
+
     watch:
       'loaded.widgets': 'onLoadedWidgets'
       'dashboard.scrollTo': 'onDashboardScrollToChange'
 
   link: ->
-    #@chartWidgets = CHANNEL.map
     @$window = $ window
     @$table = @$element.find '.jsDashboardTableBody'
     @$scroller = $ '.jsScroller'

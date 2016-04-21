@@ -4,7 +4,8 @@ module.exports =
   firebase: new Firebase FIREBASE_ADDR
 
   db:{}
-  loaded: {}
+  loaded:
+    newUser: false
 
   onLoadedFirebaseEntity: (name)->
     (entity)=>
@@ -24,6 +25,12 @@ module.exports =
       @db[name] = null
       @loaded[name] = false
 
+  isNewUser: (snapshot)->
+    @loaded.newUser = !snapshot.val()?
+
   getWidgetsArray: (uid)->
-    @loadFirebaseArray "widgets", "widgets/#{uid}"
+    widgetsPath = "widgets/#{uid}"
+    @firebase.child(widgetsPath).once 'value', @isNewUser
+    @loadFirebaseArray "widgets", widgetsPath
+    @loadFirebaseArray "messages", "messages"
 

@@ -23,8 +23,6 @@ module.exports =
             resizeMode: false
             fullScreen: false
             hideContent: false
-            canResize: true
-            options: true
 
         $body: null
         movingWidget: {}
