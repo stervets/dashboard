@@ -99,8 +99,9 @@ module.exports =
 
     resetToDefault: ->
       return unless Array.isArray @db.widgets
+      @$scope.$broadcast 'remove'
       @db.widgets.slice().forEach (widget)=>
-        @db.widgets.$remove widget
+        @[FACTORY.DASHBOARD].remove widget
       @addDefaultWidgets()
 
     addDefaultWidgets: ->
