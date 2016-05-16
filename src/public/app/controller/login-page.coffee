@@ -4,6 +4,7 @@ module.exports =
     scope:
       user: FACTORY.USER
       authPopup: FACTORY.USER
+      authAnonymously: FACTORY.USER
       canShowLoginForm: false
 
     showLoginForm: ->

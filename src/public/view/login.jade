@@ -18,9 +18,13 @@ md-content.md-hue-1.main-content(layout="column")
                         i.fa.fa-lg.fa-facebook
                         | Facebook
 
-                    md-button.md-raised(ng-click="authPopup('github')")
+                    //md-button.md-raised(ng-click="authPopup('github')")
                         i.fa.fa-lg.fa-github
                         | Github
+
+                    md-button.md-raised(ng-click="authAnonymously()")
+                        i.fa.fa-lg.fa-user
+                        | Anonym
 
             md-content.disclaimer(layout="row")
                     | * This demo application has a "developing" status and better viewing with following browsers:

@@ -17,8 +17,21 @@ module.exports =
     @$rootScope.$apply()
 
   authPopup: (provider)->
-    console.log provider
     @firebase.authWithOAuthPopup provider, @onAuthWithOAuthPopup
+
+  authAnonymously: ->
+    @firebase.authAnonymously @onAuthAnonymously
+
+  onAuthAnonymously: (error, authData)->
+    if error
+      console.warn "Can't login anonymously: #{error}"
+    else
+      angular.extend @user,
+        id: authData.uid
+        authenticated: true
+        name: "Anonymous"
+        avatar: "/img/anonym.png"
+      @$rootScope.$apply()
 
   logout: ->
     @resetUser()

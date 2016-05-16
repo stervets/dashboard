@@ -1,8 +1,15 @@
 checkAuth =
   checkUserAuth: ['$location', FACTORY.USER, '$rootScope', ($location, $user, $rootScope)->
     $rootScope.user = $user.user
+
     $rootScope.$watch 'user.authenticated', (authenticated)->
-      $location.url '/login' unless authenticated
+      if authenticated
+        unless $rootScope.user.name
+          angular.extend $rootScope.user,
+            name: "Anonymous"
+            avatar: "/img/anonym.png"
+      else
+        $location.url '/login'
   ]
 
 routes =
